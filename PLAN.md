@@ -50,7 +50,7 @@ Vue PWA → Ingress → Go API
 - **One Go API service**, with `auth` and `spotify` as separate packages inside it. No gateway: with one backend there is nothing to route between. Revisit only if a second service appears.
 - **Auth:** authorization-code flow handled server-side. Go holds the client secret and refresh token. The browser gets only an httpOnly session cookie and never sees Spotify tokens.
 - **Scope requested:** `user-top-read`.
-- **Stored data (minimal):** Spotify user ID and an encrypted refresh token.
+- **Stored data (minimal):** Spotify user ID and an encrypted refresh token. In v1 this is kept in memory behind a `Store` interface, so users log in again after a restart or deploy. Swap in persistent storage when journaling adds a database.
 - **Routing:** the Go service registers its public routes under `/api` (`/api/auth/login`, `/api/me`, ...). The Ingress sends `/api` to the Go service unchanged and `/` to the frontend. In dev, the Vite proxy forwards `/api` to Go with no rewrite, so paths are identical in dev and prod. `/healthz` and `/metrics` live outside `/api`, so the Ingress never exposes them.
 - **Redirect URI:** `http://127.0.0.1:5173/api/auth/callback` in dev (Spotify accepts loopback only as `127.0.0.1`), the cluster hostname's `/api/auth/callback` in prod.
 

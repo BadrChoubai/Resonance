@@ -6,9 +6,10 @@ VERSION ?= $(shell git describe --tags --always --dirty)
 
 API_PORT ?= 8080
 
-dev: # @HELP run the API and Vite dev server together (Ctrl+C stops both)
+dev: # @HELP run the API (with .env loaded) and Vite dev server together (Ctrl+C stops both)
 dev: web/node_modules
 	trap 'kill 0' EXIT; \
+	if [ -f .env ]; then set -a; . ./.env; set +a; fi; \
 	PORT=$(API_PORT) go run ./cmd/api & \
 	API_URL=http://localhost:$(API_PORT) npm --prefix web run dev & \
 	wait
